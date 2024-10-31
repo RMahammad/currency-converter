@@ -2,7 +2,7 @@ import axios from "axios";
 import { CurrencyRateResponse } from "../../types";
 
 const apiClient = axios.create({
-  baseURL: "https://my.transfergo.com/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
 export const fetchRates = async (

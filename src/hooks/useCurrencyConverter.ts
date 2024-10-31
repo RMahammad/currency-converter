@@ -22,11 +22,11 @@ export const useCurrencyConverter = ({
   const [convertedAmount, setConvertedAmount] = useState<number | undefined>();
   const [currencyRate, setCurrencyRate] = useState<number | undefined>();
 
-  const { data, isError, error, isSuccess } = useQuery({
+  const { data, isError, error, isSuccess, isLoading } = useQuery({
     queryKey: ["rates", fromCurrency, toCurrency, amountToSend],
     queryFn: () => fetchRates(fromCurrency, toCurrency, amountToSend),
     enabled,
-    retry: 2,
+    retry: false,
   });
 
   useEffect(() => {
@@ -36,6 +36,12 @@ export const useCurrencyConverter = ({
     }
   }, [isSuccess, data]);
 
+  useEffect(() => {
+    if (isError) {
+      setConvertedAmount(0);
+    }
+  }, [isError]);
+
   return {
     fromCurrency,
     setFromCurrency,
@@ -44,9 +50,11 @@ export const useCurrencyConverter = ({
     amountToSend,
     setAmountToSend,
     convertedAmount,
+    setConvertedAmount,
     currencyRate,
     isSuccess,
     isError,
     error,
+    isLoading,
   };
 };

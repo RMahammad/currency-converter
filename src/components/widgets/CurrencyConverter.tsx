@@ -2,7 +2,17 @@
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import Image from "next/image";
 import { useState } from "react";
-import { ApiError } from "../../types";
+import { ApiError } from "../../../types";
+import LoadingDialog from "../dialogs/LoadingDialog";
+import CustomSelect from "../form/CustomSelect";
+import DebouncedInput from "../form/DebouncedInput";
+
+const currencyOptions = [
+  { value: "EUR", label: "EUR", image: "/assets/flags/eur.svg" },
+  { value: "GBP", label: "GBP", image: "/assets/flags/gbp.svg" },
+  { value: "PLN", label: "PLN", image: "/assets/flags/pln.svg" },
+  { value: "UAH", label: "UAH", image: "/assets/flags/uah.svg" },
+];
 
 export const CurrencyConverter = () => {
   const [isConverted, setIsConverted] = useState<boolean>(false);
@@ -15,9 +25,11 @@ export const CurrencyConverter = () => {
     amountToSend,
     setAmountToSend,
     convertedAmount,
+    setConvertedAmount,
     currencyRate,
     isError,
     error,
+    isLoading,
   } = useCurrencyConverter({
     defaultFrom: "EUR",
     defaultTo: "GBP",
@@ -25,30 +37,18 @@ export const CurrencyConverter = () => {
     enabled: isConverted,
   });
 
-  console.log("This is error: ", error);
-
   return (
-    <div className="flex flex-col gap-5 min-w-80 max-w-md px-5 md:px-0">
+    <div className="flex flex-col gap-5 w-[480px] px-5 py-10 shadow-sm">
       <div className="flex items-end gap-3">
-        <div className="flex flex-col gap-2 w-full">
-          <label htmlFor="fromCurrency" className="text-xs text-gray-500">
-            From:
-          </label>
-          <select
-            id="fromCurrency"
-            value={fromCurrency}
-            onChange={(e) => setFromCurrency(e.target.value)}
-            className="border-b outline-none"
-          >
-            <option value="EUR">🇪🇺 EUR</option>
-            <option value="GBP">🇬🇧 GBP</option>
-            <option value="PLN">🇵🇱 PLN</option>
-            <option value="UAH">🇺🇦 UAH</option>
-          </select>
-        </div>
+        <CustomSelect
+          options={currencyOptions}
+          value={fromCurrency}
+          label={"From:"}
+          onChange={setFromCurrency}
+        />
 
         <Image
-          src={"/assets/exchange/exchange.svg"}
+          src={"/assets/common/exchange.svg"}
           width={20}
           height={20}
           alt="exchange"
@@ -60,35 +60,21 @@ export const CurrencyConverter = () => {
           }}
         />
 
-        <div className="flex flex-col gap-2 w-full">
-          <label htmlFor="fromCurrency" className="text-xs text-gray-500">
-            To:
-          </label>
-          <select
-            value={toCurrency}
-            onChange={(e) => setToCurrency(e.target.value)}
-            className="border-b outline-none"
-          >
-            <option value="EUR" className="">
-              🇪🇺 EUR
-            </option>
-            <option value="GBP">🇬🇧 GBP</option>
-            <option value="PLN">🇵🇱 PLN</option>
-            <option value="UAH">🇺🇦 UAH</option>
-          </select>
-        </div>
+        <CustomSelect
+          options={currencyOptions}
+          value={toCurrency}
+          label={"From:"}
+          onChange={setToCurrency}
+        />
       </div>
 
       <div className="flex items-center gap-10">
-        <div className="input-container flex items-center border-b w-full">
-          <input
-            value={amountToSend}
-            type="number"
-            onChange={(e) => setAmountToSend(parseFloat(e.target.value))}
-            className="outline-none w-full font-bold"
-          />
-          <span className="pl-2 text-gray-500">{fromCurrency}</span>
-        </div>
+        <DebouncedInput
+          amountToSend={amountToSend}
+          onChange={setAmountToSend}
+          isLoading={isLoading}
+          fromCurrency={fromCurrency}
+        />
 
         {isConverted && (
           <div className="input-container flex items-center border-b w-full">
@@ -115,7 +101,7 @@ export const CurrencyConverter = () => {
       )}
 
       {isError && (
-        <p>
+        <p className="text-red-500">
           Error:{" "}
           {error instanceof Error && (error as ApiError).response
             ? (error as ApiError).response.data.error
@@ -135,6 +121,8 @@ export const CurrencyConverter = () => {
           </p>
         </div>
       )}
+
+      {isLoading && <LoadingDialog />}
     </div>
   );
 };
