@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchRates } from "../services/apiService"; // Ensure the path is correct
+import { fetchRates } from "../services/apiService";
 
 interface UseCurrencyConverterProps {
   defaultFrom: string;
@@ -18,29 +18,50 @@ export const useCurrencyConverter = ({
 }: UseCurrencyConverterProps) => {
   const [fromCurrency, setFromCurrency] = useState(defaultFrom);
   const [toCurrency, setToCurrency] = useState(defaultTo);
-  const [amountToSend, setAmountToSend] = useState(defaultAmount);
-  const [convertedAmount, setConvertedAmount] = useState<number | undefined>();
+  const [amountToSend, setAmountToSend] = useState<number>(defaultAmount);
+  const [convertedAmount, setConvertedAmount] = useState<number>(0);
   const [currencyRate, setCurrencyRate] = useState<number | undefined>();
+  const [isReversedConversion, setIsReversedConversion] = useState(false);
 
   const { data, isError, error, isSuccess, isLoading } = useQuery({
-    queryKey: ["rates", fromCurrency, toCurrency, amountToSend],
-    queryFn: () => fetchRates(fromCurrency, toCurrency, amountToSend),
+    queryKey: isReversedConversion
+      ? ["rates", toCurrency, fromCurrency, convertedAmount]
+      : ["rates", fromCurrency, toCurrency, amountToSend],
+    queryFn: () =>
+      isReversedConversion
+        ? fetchRates(toCurrency, fromCurrency, convertedAmount || 0)
+        : fetchRates(fromCurrency, toCurrency, amountToSend),
     enabled,
     retry: false,
   });
 
   useEffect(() => {
-    if (isSuccess && data && data.toAmount !== undefined) {
-      setConvertedAmount(data.toAmount);
-      setCurrencyRate(data.rate);
+    if (isSuccess && data) {
+      if (isReversedConversion) {
+        setAmountToSend(data.toAmount);
+      } else {
+        setConvertedAmount(data.toAmount);
+        setCurrencyRate(data.rate);
+      }
     }
-  }, [isSuccess, data]);
+  }, [isSuccess, data, isReversedConversion]);
 
   useEffect(() => {
     if (isError) {
       setConvertedAmount(0);
+      setAmountToSend(0);
     }
   }, [isError]);
+
+  const updateConvertedAmount = (newConvertedAmount: number) => {
+    setIsReversedConversion(true);
+    setConvertedAmount(newConvertedAmount);
+  };
+
+  const updateAmountToSend = (newAmountToSend: number) => {
+    setIsReversedConversion(false);
+    setAmountToSend(newAmountToSend);
+  };
 
   return {
     fromCurrency,
@@ -48,9 +69,9 @@ export const useCurrencyConverter = ({
     toCurrency,
     setToCurrency,
     amountToSend,
-    setAmountToSend,
+    setAmountToSend: updateAmountToSend,
     convertedAmount,
-    setConvertedAmount,
+    setConvertedAmount: updateConvertedAmount,
     currencyRate,
     isSuccess,
     isError,

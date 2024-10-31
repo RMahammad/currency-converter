@@ -1,4 +1,11 @@
-import { useState, useEffect, ChangeEvent, FC, KeyboardEvent } from "react";
+import {
+  useState,
+  useEffect,
+  ChangeEvent,
+  FC,
+  KeyboardEvent,
+  useRef,
+} from "react";
 
 interface DebouncedInputProps {
   onChange: (value: number) => void;
@@ -13,24 +20,32 @@ const DebouncedInput: FC<DebouncedInputProps> = ({
   amountToSend,
   isLoading,
   fromCurrency,
-  debounce = 500,
+  debounce = 1000,
 }) => {
   const [value, setValue] = useState<number>(amountToSend);
+  const [userEditing, setUserEditing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setValue(amountToSend);
-  }, [amountToSend]);
+    if (!userEditing) {
+      setValue(amountToSend);
+    }
+  }, [amountToSend, userEditing]);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      onChange(value);
-    }, debounce);
+    if (userEditing) {
+      const handler = setTimeout(() => {
+        onChange(value);
+        setUserEditing(false);
+      }, debounce);
 
-    return () => clearTimeout(handler);
-  }, [value, onChange, debounce]);
+      return () => clearTimeout(handler);
+    }
+  }, [value, onChange, debounce, userEditing]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(parseFloat(e.target.value));
+    setUserEditing(true);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -39,13 +54,21 @@ const DebouncedInput: FC<DebouncedInputProps> = ({
     }
   };
 
+  const handleFocus = () => {
+    if (inputRef.current) {
+      inputRef.current.select();
+    }
+  };
+
   return (
     <div className="input-container flex items-center border-b w-full">
       <input
+        ref={inputRef}
         value={value}
         type="number"
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
         className="outline-none w-full font-bold"
         disabled={isLoading}
       />

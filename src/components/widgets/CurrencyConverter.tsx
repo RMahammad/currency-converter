@@ -25,6 +25,7 @@ export const CurrencyConverter = () => {
     amountToSend,
     setAmountToSend,
     convertedAmount,
+    setConvertedAmount,
     currencyRate,
     isError,
     error,
@@ -76,15 +77,12 @@ export const CurrencyConverter = () => {
         />
 
         {isConverted && (
-          <div className="input-container flex items-center border-b w-full">
-            <input
-              value={convertedAmount}
-              type="number"
-              onChange={() => {}}
-              className="outline-none w-full font-bold"
-            />
-            <span className="pl-2 text-gray-500">{toCurrency}</span>
-          </div>
+          <DebouncedInput
+            amountToSend={convertedAmount}
+            onChange={setConvertedAmount}
+            isLoading={isLoading}
+            fromCurrency={toCurrency}
+          />
         )}
       </div>
 
