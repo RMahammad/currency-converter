@@ -23,6 +23,7 @@ const CustomSelect: FC<CustomSelectProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const selectedOption = options.find((option) => option.value === value);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -46,13 +47,17 @@ const CustomSelect: FC<CustomSelectProps> = ({
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-2">
-          <Image
-            src={options.find((e) => e.value === value)?.image!}
-            width={20}
-            height={15}
-            alt={options.find((e) => e.value === value)?.label!}
-            className="border rounded-sm"
-          />
+          {selectedOption ? (
+            <Image
+              src={selectedOption.image}
+              width={20}
+              height={15}
+              alt={selectedOption.label}
+              className="border rounded-sm"
+            />
+          ) : (
+            <div className="h-4 w-5 border rounded-sm bg-gray-200" />
+          )}
 
           <span className="">{value}</span>
         </div>
