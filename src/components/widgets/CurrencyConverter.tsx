@@ -25,7 +25,6 @@ export const CurrencyConverter = () => {
     amountToSend,
     setAmountToSend,
     convertedAmount,
-    setConvertedAmount,
     currencyRate,
     isError,
     error,
@@ -63,7 +62,7 @@ export const CurrencyConverter = () => {
         <CustomSelect
           options={currencyOptions}
           value={toCurrency}
-          label={"From:"}
+          label={"To:"}
           onChange={setToCurrency}
         />
       </div>

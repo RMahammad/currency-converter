@@ -40,7 +40,7 @@ const CustomSelect: FC<CustomSelectProps> = ({
 
   return (
     <div className="relative w-full" ref={containerRef}>
-      <p className="text-xs text-gray-500">From:</p>
+      <p className="text-xs text-gray-500">{label}</p>
       <div
         className="flex items-center justify-between border-b cursor-pointer p-2"
         onClick={() => setIsOpen(!isOpen)}
