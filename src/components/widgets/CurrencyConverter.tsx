@@ -101,7 +101,7 @@ export const CurrencyConverter = () => {
           onClick={() => {
             setIsConverted(true);
           }}
-          className="w-full items-center justify-center bg-[#26d643] text-white py-2"
+          className="w-full items-center justify-center bg-[#26d643] text-white py-2 mt-5"
         >
           Convert
         </button>
