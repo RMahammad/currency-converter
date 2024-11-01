@@ -3,9 +3,9 @@ import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import Image from "next/image";
 import { useState } from "react";
 import { ApiError, CurrencyOptions } from "../../../types";
-import LoadingDialog from "../dialogs/LoadingDialog";
 import CustomSelect from "../form/CustomSelect";
 import DebouncedInput from "../form/DebouncedInput";
+import { ERROR_MESSAGES } from "@/constants";
 
 const currencyOptions: CurrencyOptions[] = [
   { value: "EUR", label: "EUR", image: "/assets/flags/eur.svg" },
@@ -45,7 +45,7 @@ export const CurrencyConverter = () => {
   });
 
   return (
-    <div className="flex flex-col gap-5 w-[480px] px-5 py-10 shadow-sm">
+    <div className="flex flex-col gap-5 w-[480px] px-5 py-10 shadow-3xl">
       <div className="flex items-end gap-3">
         <CustomSelect
           options={currencyOptions}
@@ -82,6 +82,7 @@ export const CurrencyConverter = () => {
           isLoading={isLoading}
           currency={fromCurrency}
           maxLimit={currencyLimits[fromCurrency]}
+          label={"Amount:"}
         />
 
         {isConverted && (
@@ -90,6 +91,7 @@ export const CurrencyConverter = () => {
             onChange={setConvertedAmount}
             isLoading={isLoading}
             currency={toCurrency}
+            label={"Converted to:"}
           />
         )}
       </div>
@@ -106,11 +108,12 @@ export const CurrencyConverter = () => {
       )}
 
       {isError && (
-        <p className="text-red-500">
-          Error:{" "}
-          {error instanceof Error && (error as ApiError).response
-            ? (error as ApiError).response.data.error
-            : "Unknown error"}
+        <p className="text-sm text-red-500">
+          {error instanceof Error &&
+          (error as ApiError).response &&
+          (error as ApiError).response.data.error === "AMOUNT_TOO_LOW"
+            ? ERROR_MESSAGES.AMOUNT_TOO_LOW
+            : ERROR_MESSAGES.UNKNOWN_ERROR}
         </p>
       )}
 
@@ -127,7 +130,8 @@ export const CurrencyConverter = () => {
         </div>
       )}
 
-      {isLoading && <LoadingDialog />}
+      {/* We can use dialog or loading animation inside input depends on situation :) */}
+      {/* {isLoading && <LoadingDialog />} */}
     </div>
   );
 };

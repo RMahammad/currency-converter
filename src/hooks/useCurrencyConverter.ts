@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchRates } from "../services/apiService";
-import { Currency } from "../../types";
+import { Currency, CurrencyRateResponse } from "../../types";
 
 interface UseCurrencyConverterProps {
   defaultFrom: Currency;
@@ -24,7 +24,7 @@ export const useCurrencyConverter = ({
   const [currencyRate, setCurrencyRate] = useState<number | undefined>();
   const [isReversedConversion, setIsReversedConversion] = useState(false);
 
-  const { data, isError, error, isSuccess, isLoading } = useQuery({
+  const { data, isError, error, isSuccess, isLoading } = useQuery<CurrencyRateResponse>({
     queryKey: isReversedConversion
       ? ["rates", toCurrency, fromCurrency, convertedAmount]
       : ["rates", fromCurrency, toCurrency, amountToSend],

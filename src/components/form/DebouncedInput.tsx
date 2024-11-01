@@ -7,6 +7,7 @@ import {
   useRef,
 } from "react";
 import { Currency } from "../../../types";
+import { ERROR_MESSAGES } from "@/constants";
 
 interface DebouncedInputProps {
   onChange: (value: number) => void;
@@ -15,6 +16,7 @@ interface DebouncedInputProps {
   currency: Currency;
   debounce?: number;
   maxLimit?: number;
+  label: string;
 }
 
 const DebouncedInput: FC<DebouncedInputProps> = ({
@@ -22,24 +24,30 @@ const DebouncedInput: FC<DebouncedInputProps> = ({
   amountToSend,
   isLoading,
   currency,
-  debounce = 600,
+  debounce = 800,
   maxLimit,
+  label,
 }) => {
   const [value, setValue] = useState<number>(amountToSend);
-  const [userEditing, setUserEditing] = useState(false);
+  const [userEditing, setUserEditing] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUserEditing(true);
+    setIsTyping(true);
     const newNumber = parseFloat(e.target.value);
+
+    if (isNaN(newNumber)) {
+      setIsTyping(false);
+    }
 
     if (maxLimit && newNumber > maxLimit) {
       setValue(maxLimit);
-      setError("You exceed limit");
+      setError(ERROR_MESSAGES.MAX_LIMIT + `${maxLimit} ${currency}`);
     } else {
       setValue(newNumber);
-      setError(null);
     }
   };
 
@@ -62,9 +70,13 @@ const DebouncedInput: FC<DebouncedInputProps> = ({
   }, [amountToSend, userEditing]);
 
   useEffect(() => {
+    setIsTyping(isLoading);
+  }, [isLoading]);
+
+  useEffect(() => {
     if (maxLimit && amountToSend > maxLimit) {
       setValue(maxLimit);
-      setError("You exceed limit");
+      setError(ERROR_MESSAGES.MAX_LIMIT + `${maxLimit} ${currency}`);
       onChange(maxLimit);
     } else {
       setValue(amountToSend);
@@ -73,10 +85,17 @@ const DebouncedInput: FC<DebouncedInputProps> = ({
   }, [currency]);
 
   useEffect(() => {
-    if (userEditing) {
+    if (isNaN(value)) {
+      setError(ERROR_MESSAGES.VALID_AMOUNT);
+    }
+
+    if (userEditing && !isNaN(value)) {
+      setError(null);
+
       const handler = setTimeout(() => {
         onChange(value);
         setUserEditing(false);
+        setIsTyping(false);
       }, debounce);
 
       return () => clearTimeout(handler);
@@ -85,8 +104,10 @@ const DebouncedInput: FC<DebouncedInputProps> = ({
 
   return (
     <div className="flex flex-col gap-1 w-full relative">
+      <p className="text-xs text-gray-500">{label}</p>
       <div className="input-container flex items-center border-b w-full">
         <input
+          aria-label={label}
           ref={inputRef}
           value={value}
           type="number"
@@ -96,12 +117,15 @@ const DebouncedInput: FC<DebouncedInputProps> = ({
           className="outline-none w-full font-bold"
           disabled={isLoading}
         />
+        {isTyping && (
+          <div className="w-4 h-3 border border-gray-300 border-t-green-500 rounded-full animate-spin" />
+        )}
         <span className="pl-2 text-gray-500">{currency}</span>
       </div>
 
       {error && (
         <p className="text-sm text-red-500 absolute -bottom-6 min-w-64">
-          {error}. Max limit: {maxLimit} {currency}
+          {error}
         </p>
       )}
     </div>
