@@ -118,7 +118,7 @@ export const CurrencyConverter = () => {
       )}
 
       {isConverted && (
-        <div className="mt-2">
+        <div className="mt-4">
           <p className="font-semibold">
             1 {fromCurrency} = {currencyRate} {toCurrency}
           </p>
