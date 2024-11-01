@@ -5,8 +5,8 @@ import { fetchRates } from "../services/apiService";
 import { Currency } from "../../types";
 
 interface UseCurrencyConverterProps {
-  defaultFrom: string;
-  defaultTo: string;
+  defaultFrom: Currency;
+  defaultTo: Currency;
   defaultAmount: number;
   enabled: boolean;
 }
