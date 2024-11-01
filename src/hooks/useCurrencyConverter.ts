@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchRates } from "../services/apiService";
+import { Currency } from "../../types";
 
 interface UseCurrencyConverterProps {
   defaultFrom: string;
@@ -16,8 +17,8 @@ export const useCurrencyConverter = ({
   defaultAmount,
   enabled,
 }: UseCurrencyConverterProps) => {
-  const [fromCurrency, setFromCurrency] = useState(defaultFrom);
-  const [toCurrency, setToCurrency] = useState(defaultTo);
+  const [fromCurrency, setFromCurrency] = useState<Currency>(defaultFrom);
+  const [toCurrency, setToCurrency] = useState<Currency>(defaultTo);
   const [amountToSend, setAmountToSend] = useState<number>(defaultAmount);
   const [convertedAmount, setConvertedAmount] = useState<number>(0);
   const [currencyRate, setCurrencyRate] = useState<number | undefined>();

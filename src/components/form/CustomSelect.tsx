@@ -1,18 +1,19 @@
 // components/CustomSelect.tsx
 import { useState, useRef, useEffect, FC } from "react";
 import Image from "next/image";
+import { Currency } from "../../../types";
 
 interface Option {
-  value: string;
+  value: Currency;
   label: string;
   image: string;
 }
 
 interface CustomSelectProps {
   options: Option[];
-  value: string;
+  value: Currency;
   label: string;
-  onChange: (value: string) => void;
+  onChange: (value: Currency) => void;
 }
 
 const CustomSelect: FC<CustomSelectProps> = ({

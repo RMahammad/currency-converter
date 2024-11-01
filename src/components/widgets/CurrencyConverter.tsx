@@ -2,17 +2,24 @@
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import Image from "next/image";
 import { useState } from "react";
-import { ApiError } from "../../../types";
+import { ApiError, CurrencyOptions } from "../../../types";
 import LoadingDialog from "../dialogs/LoadingDialog";
 import CustomSelect from "../form/CustomSelect";
 import DebouncedInput from "../form/DebouncedInput";
 
-const currencyOptions = [
+const currencyOptions: CurrencyOptions[] = [
   { value: "EUR", label: "EUR", image: "/assets/flags/eur.svg" },
   { value: "GBP", label: "GBP", image: "/assets/flags/gbp.svg" },
   { value: "PLN", label: "PLN", image: "/assets/flags/pln.svg" },
   { value: "UAH", label: "UAH", image: "/assets/flags/uah.svg" },
 ];
+
+const currencyLimits = {
+  PLN: 20000,
+  EUR: 5000,
+  GBP: 1000,
+  UAH: 50000,
+};
 
 export const CurrencyConverter = () => {
   const [isConverted, setIsConverted] = useState<boolean>(false);
@@ -73,7 +80,8 @@ export const CurrencyConverter = () => {
           amountToSend={amountToSend}
           onChange={setAmountToSend}
           isLoading={isLoading}
-          fromCurrency={fromCurrency}
+          currency={fromCurrency}
+          maxLimit={currencyLimits[fromCurrency]}
         />
 
         {isConverted && (
@@ -81,7 +89,7 @@ export const CurrencyConverter = () => {
             amountToSend={convertedAmount}
             onChange={setConvertedAmount}
             isLoading={isLoading}
-            fromCurrency={toCurrency}
+            currency={toCurrency}
           />
         )}
       </div>
@@ -107,7 +115,7 @@ export const CurrencyConverter = () => {
       )}
 
       {isConverted && (
-        <div>
+        <div className="mt-4">
           <p className="font-semibold">
             1 {fromCurrency} = {currencyRate} {toCurrency}
           </p>
