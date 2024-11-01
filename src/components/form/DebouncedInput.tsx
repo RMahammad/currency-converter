@@ -24,7 +24,7 @@ const DebouncedInput: FC<DebouncedInputProps> = ({
   amountToSend,
   isLoading,
   currency,
-  debounce = 800,
+  debounce = 1000,
   maxLimit,
   label,
 }) => {

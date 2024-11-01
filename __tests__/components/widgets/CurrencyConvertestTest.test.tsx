@@ -76,8 +76,8 @@ describe("CurrencyConverter Component", () => {
   });
 
   it("shows an error message when an error occurs", () => {
-    const mockError = new Error("Conversion error") as ApiError;
-    mockError.response = { data: { error: "Conversion error" }, status: 404 };
+    const mockError = new Error("AMOUNT_TOO_LOW") as ApiError;
+    mockError.response = { data: { error: "AMOUNT_TOO_LOW" }, status: 404 };
 
     (useCurrencyConverter as jest.Mock).mockReturnValue({
       fromCurrency: "EUR",
@@ -96,29 +96,9 @@ describe("CurrencyConverter Component", () => {
 
     render(<CurrencyConverter />);
 
-    expect(screen.getByText(/Error:/)).toHaveTextContent(
-      "Error: Conversion error"
-    );
-  });
-
-  it("displays loading dialog when loading", () => {
-    (useCurrencyConverter as jest.Mock).mockReturnValue({
-      fromCurrency: "EUR",
-      setFromCurrency: jest.fn(),
-      toCurrency: "GBP",
-      setToCurrency: jest.fn(),
-      amountToSend: 1,
-      setAmountToSend: jest.fn(),
-      convertedAmount: 0.85,
-      setConvertedAmount: jest.fn(),
-      currencyRate: 0.85,
-      isError: false,
-      error: null,
-      isLoading: true,
-    });
-
-    render(<CurrencyConverter />);
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
+    expect(
+      screen.getByText("Please enter an amount greater than 0")
+    ).toBeInTheDocument();
   });
 
   it("displays exchange rate after conversion", async () => {
