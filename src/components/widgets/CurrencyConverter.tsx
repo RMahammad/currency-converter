@@ -108,7 +108,7 @@ export const CurrencyConverter = () => {
       )}
 
       {isError && (
-        <p className="text-sm text-red-500 -mt-3">
+        <p className="text-sm text-red-500">
           {error instanceof Error &&
           (error as ApiError).response &&
           (error as ApiError).response.data.error === "AMOUNT_TOO_LOW"

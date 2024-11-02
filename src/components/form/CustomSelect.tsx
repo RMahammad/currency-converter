@@ -1,4 +1,3 @@
-// components/CustomSelect.tsx
 import { useState, useRef, useEffect, FC } from "react";
 import Image from "next/image";
 import { Currency } from "../../../types";
