@@ -75,6 +75,39 @@ describe("CurrencyConverter Component", () => {
     expect(screen.getByLabelText("Converted to:")).toBeInTheDocument();
   });
 
+  it("displays converted amount after entering an amount to send", async () => {
+    const setAmountToSendMock = jest.fn();
+    (useCurrencyConverter as jest.Mock).mockReturnValue({
+      fromCurrency: "EUR",
+      setFromCurrency: jest.fn(),
+      toCurrency: "GBP",
+      setToCurrency: jest.fn(),
+      amountToSend: 100,
+      setAmountToSend: setAmountToSendMock,
+      convertedAmount: 85,
+      setConvertedAmount: jest.fn(),
+      currencyRate: 0.85,
+      isError: false,
+      error: null,
+      isLoading: false,
+    });
+
+    render(<CurrencyConverter />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Convert/i }));
+
+    const amountInput = screen.getByLabelText("Amount:");
+    fireEvent.change(amountInput, { target: { value: "100" } });
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Amount:")).toHaveValue(100);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Converted to:")).toHaveValue(85);
+    });
+  });
+
   it("shows an error message when an error occurs", () => {
     const mockError = new Error("AMOUNT_TOO_LOW") as ApiError;
     mockError.response = { data: { error: "AMOUNT_TOO_LOW" }, status: 404 };
